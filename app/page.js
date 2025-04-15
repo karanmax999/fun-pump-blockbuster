@@ -1,133 +1,120 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { ethers } from 'ethers'
+import { useEffect, useState } from "react";
+import { ethers } from "ethers";
 
 // Components
-import Header from "./components/Header"
-import List from "./components/List"
-import Token from "./components/Token"
-import Trade from "./components/Trade"
+import Header from "./components/Header";
+import List from "./components/List";
+import Token from "./components/Token";
+import Trade from "./components/Trade";
 
 // ABIs & Config
-import Factory from "./abis/Factory.json"
-import config from "./config.json"
-import images from "./images.json"
+import Factory from "./abis/Factory.json";
+import config from "./config.json";
+import images from "./images.json";
 
 export default function Home() {
-  const [provider, setProvider] = useState(null)
-  const [account, setAccount] = useState(null)
-  const [factory, setFactory] = useState(null)
-  const [fee, setFee] = useState(0)
-  const [tokens, setTokens] = useState([])
-  const [token, setToken] = useState(null)
-  const [showCreate, setShowCreate] = useState(false)
-  const [showTrade, setShowTrade] = useState(false)
+  const [provider, setProvider] = useState(null);
+  const [account, setAccount] = useState(null);
+  const [factory, setFactory] = useState(null);
+  const [fee, setFee] = useState(0);
+  const [tokens, setTokens] = useState([]);
+  const [token, setToken] = useState(null);
+  const [showCreate, setShowCreate] = useState(false);
+  const [showTrade, setShowTrade] = useState(false);
 
-  function toggleCreate() {
-    showCreate ? setShowCreate(false) : setShowCreate(true)
-  }
+  const toggleCreate = () => setShowCreate(prev => !prev);
+  const toggleTrade = (token) => {
+    setToken(token);
+    setShowTrade(prev => !prev);
+  };
 
-  function toggleTrade(token) {
-    setToken(token)
-    showTrade ? setShowTrade(false) : setShowTrade(true)
-  }
+  const loadBlockchainData = async () => {
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      setProvider(provider);
 
-  async function loadBlockchainData() {
-    // Use MetaMask for our connection
-    const provider = new ethers.BrowserProvider(window.ethereum)
-    setProvider(provider)
+      const network = await provider.getNetwork();
+      const factory = new ethers.Contract(config[network.chainId].factory.address, Factory, provider);
+      setFactory(factory);
 
-    // Get the current network
-    const network = await provider.getNetwork()
+      const fee = await factory.fee();
+      setFee(fee);
 
-    // Create reference to Factory contract
-    const factory = new ethers.Contract(config[network.chainId].factory.address, Factory, provider)
-    setFactory(factory)
+      const totalTokens = await factory.totalTokens();
+      const tokens = [];
 
-    // Fetch the fee
-    const fee = await factory.fee()
-    setFee(fee)
-
-    // Prepare to fetch token details
-    const totalTokens = await factory.totalTokens()
-    const tokens = []
-
-    // We'll get the first 6 tokens listed
-    for (let i = 0; i < totalTokens; i++) {
-      if (i == 6) {
-        break
+      for (let i = 0; i < totalTokens && i < 6; i++) {
+        const tokenSale = await factory.getTokenSale(i);
+        tokens.push({
+          token: tokenSale.token,
+          name: tokenSale.name,
+          creator: tokenSale.creator,
+          sold: tokenSale.sold,
+          raised: tokenSale.raised,
+          isOpen: tokenSale.isOpen,
+          image: images[i],
+        });
       }
 
-      const tokenSale = await factory.getTokenSale(i)
-
-      // We create our own object to store extra fields
-      // like images
-      const token = {
-        token: tokenSale.token,
-        name: tokenSale.name,
-        creator: tokenSale.creator,
-        sold: tokenSale.sold,
-        raised: tokenSale.raised,
-        isOpen: tokenSale.isOpen,
-        image: images[i]
-      }
-
-      tokens.push(token)
+      setTokens(tokens.reverse());
+    } catch (error) {
+      console.error("Failed to load blockchain data:", error);
     }
-
-    // We reverse the array so we can get the most
-    // recent token listed to display first
-    setTokens(tokens.reverse())
-  }
+  };
 
   useEffect(() => {
-    loadBlockchainData()
-  }, [showCreate, showTrade])
+    loadBlockchainData();
+  }, [showCreate, showTrade]);
 
   return (
     <div className="page">
       <Header account={account} setAccount={setAccount} />
 
       <main>
-        <div className="create">
-          <button onClick={factory && account && toggleCreate} className="btn--fancy">
-            {!factory ? (
-              "[ contract not deployed ]"
-            ) : !account ? (
-              "[ please connect ]"
-            ) : (
-              "[ start a new token ]"
-            )}
+        <section className="create">
+          <button
+            onClick={factory && account ? toggleCreate : null}
+            className="btn--fancy"
+            disabled={!factory || !account}
+          >
+            {!factory ? "[ contract not deployed ]" : !account ? "[ please connect ]" : "[ start a new token ]"}
           </button>
-        </div>
+        </section>
 
-        <div className="listings">
+        <section className="listings">
           <h1>new listings</h1>
 
           <div className="tokens">
             {!account ? (
               <p>please connect wallet</p>
             ) : tokens.length === 0 ? (
-              <p>No tokens listed</p>
+              <p>no tokens listed</p>
             ) : (
               tokens.map((token, index) => (
-                <Token
-                  toggleTrade={toggleTrade}
-                  token={token}
-                  key={index}
-                />
+                <Token key={index} token={token} toggleTrade={toggleTrade} />
               ))
             )}
           </div>
-        </div>
+        </section>
 
         {showCreate && (
-          <List toggleCreate={toggleCreate} fee={fee} provider={provider} factory={factory} />
+          <List
+            toggleCreate={toggleCreate}
+            fee={fee}
+            provider={provider}
+            factory={factory}
+          />
         )}
 
         {showTrade && (
-          <Trade toggleTrade={toggleTrade} token={token} provider={provider} factory={factory} />
+          <Trade
+            toggleTrade={toggleTrade}
+            token={token}
+            provider={provider}
+            factory={factory}
+          />
         )}
       </main>
     </div>

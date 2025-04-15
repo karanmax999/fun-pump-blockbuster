@@ -1,6 +1,12 @@
 :root {
-  --background: #1B1D29;
+  --background: #1b1d29;
   --foreground: #ededed;
+  --primary-color: #4caf50;
+  --secondary-color: #ff9800;
+  --font-family-sans: "Nabla", Arial, Helvetica, sans-serif;
+  --font-family-serif: "Georgia", serif;
+  --border-radius: 8px;
+  --transition-duration: 0.3s;
 }
 
 html,
