@@ -8,6 +8,11 @@ import Header from "./components/Header";
 import List from "./components/List";
 import Token from "./components/Token";
 import Trade from "./components/Trade";
+import Navbar from "./components/Navbar";     
+import UserInfo from "./components/UserInfo";  
+
+import "./globals.css"; // Make sure the path matches your project structure
+
 
 // ABIs & Config
 import Factory from "./abis/Factory.json";
@@ -70,53 +75,71 @@ export default function Home() {
 
   return (
     <div className="page">
-      <Header account={account} setAccount={setAccount} />
+  {/* Header should span full width */}
+  <header style={{ gridColumn: "1 / -1" }}>
+    <Header account={account} setAccount={setAccount} />
+  </header>
 
-      <main>
-        <section className="create">
-          <button
-            onClick={factory && account ? toggleCreate : null}
-            className="btn--fancy"
-            disabled={!factory || !account}
-          >
-            {!factory ? "[ contract not deployed ]" : !account ? "[ please connect ]" : "[ start a new token ]"}
-          </button>
-        </section>
+  {/* User Info on the right (3 cols) */}
+  <div style={{ gridColumn: "10 / 13" }}>
+    <UserInfo account={account} />
+  </div>
 
-        <section className="listings">
-          <h1>new listings</h1>
+  {/* Navbar on the left (2 cols) */}
+  <div style={{ gridColumn: "1 / 3" }}>
+    <Navbar />
+  </div>
 
-          <div className="tokens">
-            {!account ? (
-              <p>please connect wallet</p>
-            ) : tokens.length === 0 ? (
-              <p>no tokens listed</p>
-            ) : (
-              tokens.map((token, index) => (
-                <Token key={index} token={token} toggleTrade={toggleTrade} />
-              ))
-            )}
-          </div>
-        </section>
+  {/* Main content in center (8 cols) */}
+  <main className="main" style={{ gridColumn: "3 / 11" }}>
+    <section className="create">
+      <button
+        onClick={factory && account ? toggleCreate : null}
+        className="btn--fancy"
+        disabled={!factory || !account}
+      >
+        {!factory
+          ? "[ contract not deployed ]"
+          : !account
+          ? "[ please connect ]"
+          : "[ start a new token ]"}
+      </button>
+    </section>
 
-        {showCreate && (
-          <List
-            toggleCreate={toggleCreate}
-            fee={fee}
-            provider={provider}
-            factory={factory}
-          />
+    <section className="listings">
+      <h1>new listings</h1>
+      <div className="tokens">
+        {!account ? (
+          <p>please connect wallet</p>
+        ) : tokens.length === 0 ? (
+          <p>no tokens listed</p>
+        ) : (
+          tokens.map((token, index) => (
+            <Token key={index} token={token} toggleTrade={toggleTrade} />
+          ))
         )}
+      </div>
+    </section>
 
-        {showTrade && (
-          <Trade
-            toggleTrade={toggleTrade}
-            token={token}
-            provider={provider}
-            factory={factory}
-          />
-        )}
-      </main>
-    </div>
+    {showCreate && (
+      <List
+        toggleCreate={toggleCreate}
+        fee={fee}
+        provider={provider}
+        factory={factory}
+      />
+    )}
+
+    {showTrade && (
+      <Trade
+        toggleTrade={toggleTrade}
+        token={token}
+        provider={provider}
+        factory={factory}
+      />
+    )}
+  </main>
+</div>
+
   );
 }

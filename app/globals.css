@@ -18,11 +18,17 @@ body {
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: "Nabla", Arial, Helvetica, sans-serif;
+  font-family: var(--font-family-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 0 20px;
 }
 
+/* Global Reset */
 * {
   box-sizing: border-box;
   padding: 0;
@@ -32,49 +38,64 @@ body {
 h1,
 h2,
 h3 {
-  font-family: "Nabla";
+  font-family: var(--font-family-sans);
 }
 
 h2 {
   font-size: 2rem;
 }
 
+/* Page Grid Layout */
 .page {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
 }
 
 /* HEADER STYLES */
-
 header {
   grid-column: 2 / 12;
-
   display: flex;
   justify-content: space-between;
   align-items: center;
-
   padding: 2em 0;
+  backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+  transition: all var(--transition-duration);
 }
 
 header .brand {
-  font-family: "Nabla";
-  font-size: 2rem;
+  font-family: var(--font-family-sans);
+  font-size: 2.5rem;
+  color: var(--foreground);
+  text-transform: uppercase;
+  letter-spacing: 2px;
   transform: rotate(-5deg);
+  transition: transform var(--transition-duration), color var(--transition-duration);
 }
 
-/* BUTTON STYLES */
+header .brand:hover {
+  transform: rotate(0deg);
+  color: var(--primary-color);
+}
 
+
+
+/* BUTTON STYLES */
 .btn--fancy,
 input[type="submit"] {
   font-family: "Nabla";
   font-size: 1.5rem;
 
-  background: transparent;
+  background: rgba(0, 128, 128, 0.6);
   border: none;
-
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: var(--border-radius);
   cursor: pointer;
-
   transition: 250ms ease all;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
 header .btn--fancy {
@@ -85,13 +106,15 @@ main .create .btn--fancy {
   font-size: 2rem;
 }
 
+/* Hover and Active States */
 .btn--fancy:hover,
 input[type="submit"]:hover {
   transform: scale(1.2);
+  background: rgba(0, 128, 128, 0.8);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
 }
 
 /* MAIN LAYOUT */
-
 main {
   grid-column: 2 / 12;
 
@@ -106,6 +129,35 @@ main .create {
   place-content: center;
   min-height: 30svh;
 }
+
+/* Glassmorphism Effect for Buttons */
+.btn--fancy {
+  background: rgba(255, 255, 255, 0.1); /* Glassy effect */
+  backdrop-filter: blur(10px);
+  border-radius: var(--border-radius);
+  color: var(--foreground);
+  padding: 12px 24px;
+  font-size: 1.5rem;
+  transition: background 250ms ease, transform 250ms ease, box-shadow 250ms ease;
+}
+
+.btn--fancy:hover {
+  background: rgba(0, 128, 128, 0.7); /* Slightly stronger color */
+  transform: scale(1.2);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+}
+
+input[type="submit"]:hover {
+  background: rgba(0, 128, 128, 0.7);
+}
+
+/* Focus States for Interactive Elements */
+input[type="submit"]:focus,
+.btn--fancy:focus {
+  outline: none;
+  box-shadow: 0 0 8px rgba(0, 128, 128, 0.8);
+}
+
 
 /* DISPLAY TOKEN LISTINGS */
 
@@ -134,14 +186,15 @@ main .listings h1 {
 }
 
 .token {
-  background: none;
-  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(0, 255, 213, 0.08);
+  backdrop-filter: blur(10px);
   color: var(--foreground);
-  padding: 1em;
-
+  padding: 1.25em;
   font-size: 1.05rem;
-
-  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .token:nth-child(1) {
@@ -150,8 +203,11 @@ main .listings h1 {
 
 .token:hover {
   border: 1px solid var(--foreground);
+  box-shadow: 0 0 18px #00ffd5;
+  transform: scale(1.05);
 }
 
+/* Blink Animation */
 @keyframes blink {
   0% {
     background: yellow;
@@ -192,17 +248,14 @@ main .listings h1 {
 }
 
 /* CREATE TOKEN FORM */
-
 .list {
   width: 100vw;
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.9);
-
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -230,7 +283,6 @@ main .listings h1 {
   background-color: var(--background);
   color: var(--foreground);
   border: none;
-
   width: 200px;
   padding: 1.50em;
   border-radius: 6px;
@@ -241,12 +293,10 @@ main .listings h1 {
   width: 100vw;
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.9);
-
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -278,8 +328,84 @@ main .listings h1 {
   background-color: var(--background);
   color: var(--foreground);
   border: none;
-
   width: 200px;
   padding: 1.50em;
   border-radius: 6px;
 }
+
+/* USER INFO */
+.userinfo-glass {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.5rem;
+  padding: 1rem 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.user-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid #00ffd5;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.user-address {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.status-indicator {
+  font-size: 0.85rem;
+}
+
+.status-indicator.online {
+  color: #0f0;
+}
+
+.status-indicator.offline {
+  color: #f00;
+}
+
+/* NAVBAR */
+.navbar-glass {
+  margin: 0 1.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 16px;
+  background: rgba(0, 255, 213, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 255, 213, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.2s ease;
+}
+
+.nav-links a:hover {
+  color: #00ffd5;
+}
+

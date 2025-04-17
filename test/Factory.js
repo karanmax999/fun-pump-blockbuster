@@ -15,7 +15,7 @@ describe("Factory", function () {
     const factory = await Factory.deploy(FEE)
 
     // Create token
-    const transaction = await factory.connect(creator).create("DAPP Uni", "DAPP", { value: FEE })
+    const transaction = await factory.connect(creator).create("KARANMAX Uni", "KARN", { value: FEE })
     await transaction.wait()
 
     // Get token address
